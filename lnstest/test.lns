@@ -1,0 +1,51 @@
+import go/github:com.ifritJP.lnssqlite3.base;
+
+pub fn __main( args:&List<str> ) : int {
+
+   let! mut db = base.Open( "hoge.sqlite3", false, false ) {
+      print( "open error" );
+      return 1;
+   };
+
+   let stmt = ```
+      create table foo (id integer not null primary key, name text);
+   delete from foo;
+```;
+   db.Exec( stmt, nil );
+
+   db.Begin();
+   for index = 0, 10 {
+      let sql = "insert into foo(id, name) values(%d, 'こんにちわ世界%03d')"
+          ( index, index );
+      db.Exec( sql, nil );
+   }
+   db.Commit();
+
+   db.MapQuery( "select id, name from foo",
+                fn ( row : &List<&stem> ) : bool {
+                   print( row[ 1 ]@@int + 10, row[ 2 ]@@str .. "hoge" );
+                   return true;
+                } );
+
+   db.MapQuery( "select name from foo where id = 3",
+                fn ( row : &List<&stem> ) : bool {
+                   print( row[ 1 ] );
+                   return false;
+                } );
+
+
+   db.Exec( "delete from foo", nil);
+
+   db.Exec("insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')", nil);
+      
+
+   db.MapQuery( "select id, name from foo",
+                fn ( row : &List<&stem> ) : bool {
+                   print( row[1], row[2]);
+                   return true;
+                } );
+   
+   db.Close();
+   
+   return 0;
+}

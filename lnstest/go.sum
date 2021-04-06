@@ -1,0 +1,14 @@
+github.com/Azure/golua v0.0.0-20190201163710-5105380e8196 h1:MsDn6eUTEWKjZXDV1oz0NLuj8ikiBnjVhq08MFzaiEI=
+github.com/Azure/golua v0.0.0-20190201163710-5105380e8196/go.mod h1:Qtqr8Y+5vWnmz/4RWerkYOJfugBu9ViPCFC8yvvFL5I=
+github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
+github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
+github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
+github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da h1:oI5xCqsCo564l8iNU+DwB5epxmsaqB+rhGL0m5jtYqE=
+github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
+github.com/ifritJP/LuneScript v1.1.13-0.20210402225818-4fa2fb884b4b h1:s3NlStgh0oxwycnQjzyCVcM37EY75WXaajwGuJcQBJk=
+github.com/ifritJP/LuneScript v1.1.13-0.20210402225818-4fa2fb884b4b/go.mod h1:7FObwVFVRwyN431aH9AFv6t5XQE05d2Sy2bKJlmA5VU=
+github.com/mattn/go-sqlite3 v1.14.6 h1:dNPt6NO46WmLVt2DLNpwczCmdV5boIZ6g/tlDrlRUbg=
+github.com/mattn/go-sqlite3 v1.14.6/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
+github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da h1:NimzV1aGyq29m5ukMK0AMWEhFaL/lrEOaephfuoiARg=
+github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da/go.mod h1:E1AXubJBdNmFERAOucpDIxNzeGfLzg0mYh+UfMWdChA=
+golang.org/x/sys v0.0.0-20190204203706-41f3e6584952/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=

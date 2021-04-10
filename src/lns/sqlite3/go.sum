@@ -1,6 +1,0 @@
-github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da h1:oI5xCqsCo564l8iNU+DwB5epxmsaqB+rhGL0m5jtYqE=
-github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
-github.com/ifritJP/LuneScript v1.1.12 h1:IeGPQwQ6uKbdA9u2oKQtl1hyuB86cpILvWz6UBPvjfs=
-github.com/ifritJP/LuneScript v1.1.12/go.mod h1:7FObwVFVRwyN431aH9AFv6t5XQE05d2Sy2bKJlmA5VU=
-github.com/mattn/go-sqlite3 v1.14.6 h1:dNPt6NO46WmLVt2DLNpwczCmdV5boIZ6g/tlDrlRUbg=
-github.com/mattn/go-sqlite3 v1.14.6/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=

@@ -1,7 +1,7 @@
 // This code is transcompiled by LuneScript.
 package main
 import . "github.com/ifritJP/LuneScript/src/lune/base/runtime_go"
-import base "github.com/ifritJP/lnssqlite3"
+import base "github.com/ifritJP/lnssqlite3/src/lns/sqlite3"
 var init_test bool
 var test__mod__ string
 // for 5

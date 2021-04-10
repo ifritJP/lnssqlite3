@@ -65,7 +65,7 @@ end
 if not _lune3 then
    _lune3 = _lune
 end
-local base = _lune.loadModule( 'go/github:com.ifritJP.lnssqlite3.base' )
+local base = _lune.loadModule( 'go/github:com.ifritJP.lnssqlite3.src.lns.sqlite3.base' )
 
 local function __main( args )
 

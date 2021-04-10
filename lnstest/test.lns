@@ -1,4 +1,4 @@
-import go/github:com.ifritJP.lnssqlite3.base;
+import go/github:com.ifritJP.lnssqlite3.src.lns.sqlite3.base;
 
 pub fn __main( args:&List<str> ) : int {
 

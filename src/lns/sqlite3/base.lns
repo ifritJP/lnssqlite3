@@ -9,7 +9,7 @@ pub interface DB {
    pub fn MapQuery( query: str, callback: queryForm! ) : bool;
 }
 
-module Access require "access" of "" {
+module Access require "lns.sqlite3.access" of "" {
    pub static fn Open( path: str, readonly: bool, onMemoryFlag: bool ) : DB!, str;
 }
 

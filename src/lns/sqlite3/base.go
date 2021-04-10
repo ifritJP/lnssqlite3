@@ -1,11 +1,11 @@
 // This code is transcompiled by LuneScript.
-package lnssqlite3
+package sqlite3
 import . "github.com/ifritJP/LuneScript/src/lune/base/runtime_go"
 var init_base bool
 var base__mod__ string
 type Base_errHandleForm func (arg1 string,arg2 string)
 type Base_queryForm func (arg1 *LnsList) bool
-// 16: decl @base.Open
+// 16: decl @lns.@sqlite3.@base.Open
 func Base_Open(path string,readonly bool,onMemoryFlag bool)(LnsAny, string) {
     return Open(path, readonly, onMemoryFlag)
 }
@@ -28,7 +28,7 @@ func Lns_cast2Base_DB( obj LnsAny ) LnsAny {
 func Lns_base_init() {
     if init_base { return }
     init_base = true
-    base__mod__ = "@base"
+    base__mod__ = "@lns.@sqlite3.@base"
     Lns_InitMod()
 }
 func init() {

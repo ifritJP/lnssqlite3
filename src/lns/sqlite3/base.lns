@@ -1,5 +1,6 @@
 pub form errHandleForm( stmt:str, msg:str );
 pub form queryForm( items: &List<&stem> ) : bool;
+pub form queryMapForm( items: &Map<str,&stem> ) : bool;
 
 pub interface DB {
    pub fn Close() mut;
@@ -7,6 +8,7 @@ pub interface DB {
    pub fn Begin() mut;
    pub fn Commit() mut;
    pub fn MapQuery( query: str, callback: queryForm! ) : bool;
+   pub fn MapQueryAsMap( query: str, callback: queryMapForm! ) : bool;
 }
 
 module Access require "lns.sqlite3.access" of "" {
@@ -16,3 +18,4 @@ module Access require "lns.sqlite3.access" of "" {
 pub fn Open( path: str, readonly: bool, onMemoryFlag: bool ) : DB!, str {
    return Access.Open( path, readonly, onMemoryFlag )**;
 }
+

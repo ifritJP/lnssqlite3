@@ -111,3 +111,51 @@ func (db *DB) MapQuery( query string, callback LnsAny ) bool {
 	}
     return hasRow
 }
+
+func (db *DB) MapQueryAsMap( query string, callback LnsAny ) bool {
+	rows, err := db.sqldb.Query( query )
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+    columnNames, _ := rows.Columns()
+    hasRow := false
+    columns := map[LnsAny]LnsAny{}
+    columnsBuf := make( []LnsAny, len( columnNames ) )
+    for index := 0; index < len( columnNames ); index++ {
+        var val LnsAny = nil
+        columnsBuf[ index ] = &val
+    }
+	for rows.Next() {
+        if !hasRow {
+            hasRow = true
+        }
+        if err := rows.Scan( columnsBuf... ); err != nil {
+            log.Fatal( err )
+        }
+        for index := 0; index < len( columnNames ); index++ {
+            name := columnNames[ index ]
+            ifVal := *(columnsBuf[index].(*LnsAny))
+            switch ifVal.(type) {
+            case int64:
+                columns[ name ] = LnsInt( ifVal.(int64) )
+            case []byte:
+                columns[ name ] = string( ifVal.([]byte ) )
+            default:
+                columns[ name ] = ifVal
+            }
+        }
+
+        if callback != nil {
+            callbackFunc := callback.(Base_queryMapForm)
+            if !callbackFunc( NewLnsMap( columns ) ) {
+                break
+            }
+        }
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+    return hasRow
+}

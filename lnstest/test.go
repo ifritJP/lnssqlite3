@@ -4,7 +4,7 @@ import . "github.com/ifritJP/LuneScript/src/lune/base/runtime_go"
 import base "github.com/ifritJP/lnssqlite3/src/lns/sqlite3"
 var init_test bool
 var test__mod__ string
-// for 5
+// for 6
 func test_convExp39(arg1 []LnsAny) LnsAny {
     return Lns_getFromMulti( arg1, 0 )
 }
@@ -16,11 +16,11 @@ func __main___anonymous_1021_(row *LnsList) bool {
     Lns_print([]LnsAny{row.GetAt(1)})
     return false
 }
-func __main___anonymous_1028_(row *LnsList) bool {
-    Lns_print([]LnsAny{row.GetAt(1), row.GetAt(2)})
+func __main___anonymous_1028_(row *LnsMap) bool {
+    Lns_print([]LnsAny{row.Items["id"], row.Items["name"]})
     return true
 }
-// 3: decl @test.__main
+// 4: decl @test.__main
 func Test___main(args *LnsList) LnsInt {
     Lns_test_init()
     var db base.Base_DB
@@ -53,7 +53,7 @@ func Test___main(args *LnsList) LnsInt {
     db.MapQuery("select name from foo where id = 3", base.Base_queryForm(__main___anonymous_1021_))
     db.Exec("delete from foo", nil)
     db.Exec("insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')", nil)
-    db.MapQuery("select id, name from foo", base.Base_queryForm(__main___anonymous_1028_))
+    db.MapQueryAsMap("select id, name from foo", base.Base_queryMapForm(__main___anonymous_1028_))
     db.Close()
     return 0
 }

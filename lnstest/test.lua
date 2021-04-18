@@ -109,9 +109,9 @@ local function __main( args )
    
    db:Exec( "insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')", nil )
    
-   db:MapQuery( "select id, name from foo", function ( row )
+   db:MapQueryAsMap( "select id, name from foo", function ( row )
    
-      print( row[1], row[2] )
+      print( row['id'], row['name'] )
       return true
    end )
    

@@ -1,3 +1,4 @@
+// -*- coding: utf-8 -*-
 import go/github:com.ifritJP.lnssqlite3.src.lns.sqlite3.base;
 
 pub fn __main( args:&List<str> ) : int {
@@ -39,11 +40,11 @@ pub fn __main( args:&List<str> ) : int {
    db.Exec("insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')", nil);
       
 
-   db.MapQuery( "select id, name from foo",
-                fn ( row : &List<&stem> ) : bool {
-                   print( row[1], row[2]);
-                   return true;
-                } );
+   db.MapQueryAsMap( "select id, name from foo",
+                     fn ( row : &Map<str,&stem> ) : bool {
+                        print( row.id, row.name);
+                        return true;
+                     } );
    
    db.Close();
    

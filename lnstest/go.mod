@@ -3,12 +3,10 @@ module test
 go 1.16
 
 require (
-	github.com/Azure/golua v0.0.0-20190201163710-5105380e8196 // indirect
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/ifritJP/LuneScript v1.1.13-0.20210402225818-4fa2fb884b4b
-	github.com/ifritJP/lnssqlite3 v0.0.0
-	github.com/mattn/go-sqlite3 v1.14.6 // indirect
-	github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da // indirect
+	github.com/ifritJP/LuneScript/src v0.0.0-20210415132108-9d12391b7c1e
+	github.com/ifritJP/lnssqlite3/src v0.0.0-20210415125250-f4bcfc7c361a
 )
 
-replace github.com/ifritJP/lnssqlite3 => ../
+replace github.com/ifritJP/LuneScript/src => ../../LuneScript/src
+
+replace github.com/ifritJP/lnssqlite3/src => ../src

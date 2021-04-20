@@ -15,6 +15,14 @@ type DB struct {
     sqldb *sql.DB
 }
 
+func callErrHanlde( errHandle LnsAny, stmt string, err error ) {
+    if !Lns_IsNil( errHandle ) {
+        errHandleFunc := errHandle.(Base_errHandleForm)
+        errHandleFunc( stmt, err.Error() )
+    } else {
+        log.Fatal( err )
+    }
+}
 
 func Open( path string, readonly bool, onMemoryFlag bool ) (LnsAny, string) {
 	db, err := sql.Open("sqlite3", path )
@@ -36,16 +44,13 @@ func (db *DB) Exec( stmt string, errHandle LnsAny ) {
     } else {
         var preStmt *sql.Stmt
         preStmt, err = db.tx.Prepare(stmt)
-        defer preStmt.Close()
-        preStmt.Exec()
+        if err == nil {
+            defer preStmt.Close()
+            preStmt.Exec()
+        }
     }
 	if err != nil {
-        if errHandle != nil {
-            errHandleFunc := errHandle.(func( stmt string, msg string ))
-            errHandleFunc( stmt, err.Error() )
-        } else {
-            log.Fatal( err )
-        }
+        callErrHanlde( errHandle, stmt, err )
 	}
 }
 
@@ -64,11 +69,24 @@ func (db *DB) Commit() {
     }
 }
 
+func (db *DB) query( query string ) (*sql.Rows,error) {
+    var rows *sql.Rows
+    var err error
 
-func (db *DB) MapQuery( query string, callback LnsAny ) bool {
-	rows, err := db.sqldb.Query( query )
+    if db.tx != nil {
+        rows, err = db.tx.Query( query )
+    } else {
+        rows, err = db.sqldb.Query( query )
+    }
+    return rows, err
+}
+
+
+func (db *DB) MapQuery( query string, callback LnsAny, errHandle LnsAny ) bool {
+    rows, err := db.query( query )
 	if err != nil {
-		log.Fatal(err)
+        callErrHanlde( errHandle, query, err )
+        return false
 	}
 	defer rows.Close()
     columnNames, _ := rows.Columns()
@@ -84,7 +102,8 @@ func (db *DB) MapQuery( query string, callback LnsAny ) bool {
             hasRow = true
         }
         if err := rows.Scan( columnsBuf... ); err != nil {
-            log.Fatal( err )
+            callErrHanlde( errHandle, query, err )
+            break
         }
         for index := 0; index < len( columnNames ); index++ {
             ifVal := *(columnsBuf[index].(*LnsAny))
@@ -107,15 +126,16 @@ func (db *DB) MapQuery( query string, callback LnsAny ) bool {
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+        callErrHanlde( errHandle, query, err )
 	}
     return hasRow
 }
 
-func (db *DB) MapQueryAsMap( query string, callback LnsAny ) bool {
-	rows, err := db.sqldb.Query( query )
+func (db *DB) MapQueryAsMap( query string, callback LnsAny, errHandle LnsAny ) bool {
+    rows, err := db.query( query )
 	if err != nil {
-		log.Fatal(err)
+        callErrHanlde( errHandle, query, err )
+        return false
 	}
 	defer rows.Close()
     columnNames, _ := rows.Columns()
@@ -131,7 +151,8 @@ func (db *DB) MapQueryAsMap( query string, callback LnsAny ) bool {
             hasRow = true
         }
         if err := rows.Scan( columnsBuf... ); err != nil {
-            log.Fatal( err )
+            callErrHanlde( errHandle, query, err )
+            break
         }
         for index := 0; index < len( columnNames ); index++ {
             name := columnNames[ index ]
@@ -155,7 +176,7 @@ func (db *DB) MapQueryAsMap( query string, callback LnsAny ) bool {
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+        callErrHanlde( errHandle, query, err )
 	}
     return hasRow
 }

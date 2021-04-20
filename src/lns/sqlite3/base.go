@@ -16,8 +16,8 @@ type Base_DB interface {
         Close()
         Commit()
         Exec(arg1 string, arg2 LnsAny)
-        MapQuery(arg1 string, arg2 LnsAny) bool
-        MapQueryAsMap(arg1 string, arg2 LnsAny) bool
+        MapQuery(arg1 string, arg2 LnsAny, arg3 LnsAny) bool
+        MapQueryAsMap(arg1 string, arg2 LnsAny, arg3 LnsAny) bool
 }
 func Lns_cast2Base_DB( obj LnsAny ) LnsAny {
     if _, ok := obj.(Base_DB); ok { 

@@ -7,8 +7,8 @@ pub interface DB {
    pub fn Exec( stmt:str, errHandle: errHandleForm! ) mut;
    pub fn Begin() mut;
    pub fn Commit() mut;
-   pub fn MapQuery( query: str, callback: queryForm! ) : bool;
-   pub fn MapQueryAsMap( query: str, callback: queryMapForm! ) : bool;
+   pub fn MapQuery( query: str, callback: queryForm!, errHandle: errHandleForm! ) : bool;
+   pub fn MapQueryAsMap( query: str, callback: queryMapForm!, errHandle: errHandleForm! ) : bool;
 }
 
 module Access require "lns.sqlite3.access" of "" {

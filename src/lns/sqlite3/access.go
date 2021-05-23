@@ -16,16 +16,16 @@ type DB struct {
 	sqldb *sql.DB
 }
 
-func callErrHanlde(errHandle LnsAny, stmt string, err error) {
+func callErrHanlde(_env *LnsEnv, errHandle LnsAny, stmt string, err error) {
 	if !Lns_IsNil(errHandle) {
 		errHandleFunc := errHandle.(Base_errHandleForm)
-		errHandleFunc(stmt, err.Error())
+		errHandleFunc(_env,stmt, err.Error())
 	} else {
 		log.Fatal(err)
 	}
 }
 
-func Open(path string, readonly bool, onMemoryFlag bool) (LnsAny, string) {
+func Open(_env *LnsEnv, path string, readonly bool, onMemoryFlag bool) (LnsAny, string) {
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, err.Error()
@@ -34,11 +34,11 @@ func Open(path string, readonly bool, onMemoryFlag bool) (LnsAny, string) {
 	return &DB{nil, db}, "ok"
 }
 
-func (db *DB) Close() {
+func (db *DB) Close(_env *LnsEnv) {
 	db.sqldb.Close()
 }
 
-func (db *DB) Exec(stmt string, errHandle LnsAny) {
+func (db *DB) Exec(_env *LnsEnv, stmt string, errHandle LnsAny) {
 	var err error
 	if db.tx == nil {
 		_, err = db.sqldb.Exec(stmt)
@@ -51,11 +51,11 @@ func (db *DB) Exec(stmt string, errHandle LnsAny) {
 		}
 	}
 	if err != nil {
-		callErrHanlde(errHandle, stmt, err)
+		callErrHanlde(_env, errHandle, stmt, err)
 	}
 }
 
-func (db *DB) Begin() {
+func (db *DB) Begin(_env *LnsEnv) {
 	tx, err := db.sqldb.Begin()
 	if err != nil {
 		log.Fatal(err)
@@ -63,14 +63,14 @@ func (db *DB) Begin() {
 	db.tx = tx
 }
 
-func (db *DB) Commit() {
+func (db *DB) Commit(_env *LnsEnv) {
 	if db.tx != nil {
 		db.tx.Commit()
 		db.tx = nil
 	}
 }
 
-func (db *DB) query(query string) (*sql.Rows, error) {
+func (db *DB) query(_env *LnsEnv, query string) (*sql.Rows, error) {
 	var rows *sql.Rows
 	var err error
 
@@ -82,10 +82,10 @@ func (db *DB) query(query string) (*sql.Rows, error) {
 	return rows, err
 }
 
-func (db *DB) MapQuery(query string, callback LnsAny, errHandle LnsAny) bool {
-	rows, err := db.query(query)
+func (db *DB) MapQuery(_env *LnsEnv, query string, callback LnsAny, errHandle LnsAny) bool {
+	rows, err := db.query(_env, query)
 	if err != nil {
-		callErrHanlde(errHandle, query, err)
+		callErrHanlde(_env, errHandle, query, err)
 		return false
 	}
 	defer rows.Close()
@@ -102,7 +102,7 @@ func (db *DB) MapQuery(query string, callback LnsAny, errHandle LnsAny) bool {
 			hasRow = true
 		}
 		if err := rows.Scan(columnsBuf...); err != nil {
-			callErrHanlde(errHandle, query, err)
+			callErrHanlde(_env, errHandle, query, err)
 			break
 		}
 		for index := 0; index < len(columnNames); index++ {
@@ -119,22 +119,23 @@ func (db *DB) MapQuery(query string, callback LnsAny, errHandle LnsAny) bool {
 
 		if callback != nil {
 			callbackFunc := callback.(Base_queryForm)
-			if !callbackFunc(NewLnsList(columns)) {
+			if !callbackFunc(_env, NewLnsList(columns)) {
 				break
 			}
 		}
 	}
 	err = rows.Err()
 	if err != nil {
-		callErrHanlde(errHandle, query, err)
+		callErrHanlde(_env, errHandle, query, err)
 	}
 	return hasRow
 }
 
-func (db *DB) MapQueryAsMap(query string, callback LnsAny, errHandle LnsAny) bool {
-	rows, err := db.query(query)
+func (db *DB) MapQueryAsMap(
+    _env *LnsEnv, query string, callback LnsAny, errHandle LnsAny) bool {
+	rows, err := db.query(_env, query)
 	if err != nil {
-		callErrHanlde(errHandle, query, err)
+		callErrHanlde(_env, errHandle, query, err)
 		return false
 	}
 	defer rows.Close()
@@ -151,7 +152,7 @@ func (db *DB) MapQueryAsMap(query string, callback LnsAny, errHandle LnsAny) boo
 			hasRow = true
 		}
 		if err := rows.Scan(columnsBuf...); err != nil {
-			callErrHanlde(errHandle, query, err)
+			callErrHanlde(_env, errHandle, query, err)
 			break
 		}
 		for index := 0; index < len(columnNames); index++ {
@@ -169,14 +170,14 @@ func (db *DB) MapQueryAsMap(query string, callback LnsAny, errHandle LnsAny) boo
 
 		if callback != nil {
 			callbackFunc := callback.(Base_queryMapForm)
-			if !callbackFunc(NewLnsMap(columns)) {
+			if !callbackFunc(_env, NewLnsMap(columns)) {
 				break
 			}
 		}
 	}
 	err = rows.Err()
 	if err != nil {
-		callErrHanlde(errHandle, query, err)
+		callErrHanlde(_env, errHandle, query, err)
 	}
 	return hasRow
 }

@@ -2,9 +2,16 @@
 local _moduleObj = {}
 local __mod__ = '@test'
 local _lune = {}
-if _lune3 then
-   _lune = _lune3
+if _lune6 then
+   _lune = _lune6
 end
+function _lune.loadstring52( txt, env )
+   if not env then
+      return load( txt )
+   end
+   return load( txt, "", "bt", env )
+end
+
 function _lune.loadModule( mod )
    if __luneScript then
       return  __luneScript:loadModule( mod )
@@ -62,13 +69,14 @@ function _lune.__Cast( obj, kind, class )
    return nil
 end
 
-if not _lune3 then
-   _lune3 = _lune
+if not _lune6 then
+   _lune6 = _lune
 end
 local base = _lune.loadModule( 'go/github:com.ifritJP.lnssqlite3.src.lns.sqlite3.base' )
 
 local function __main( args )
 
+   print( package.path )
    
    local db = base.Open( "hoge.sqlite3", false, false )
    if  nil == db then
@@ -120,5 +128,41 @@ local function __main( args )
    return 0
 end
 _moduleObj.__main = __main
+
+do
+   local loaded, mess = _lune.loadstring52( [=[
+if _lune and _lune._shebang then
+  return nil
+else
+  return arg
+end
+]=] )
+   if loaded ~= nil then
+      local args = loaded(  )
+      do
+         local obj = (args )
+         if obj ~= nil then
+            local work = obj
+            local argList = {""}
+            do
+               local _exp = work[0]
+               if _exp ~= nil then
+                  argList[1] = _exp
+               end
+            end
+            for key, val in pairs( work ) do
+               if key > 0 then
+                  table.insert( argList, val )
+               end
+            end
+            __main( argList )
+         else
+            -- print( "via lnsc" )
+         end
+      end
+   else
+      error( mess )
+   end
+end
 
 return _moduleObj

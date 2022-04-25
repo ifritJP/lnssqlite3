@@ -2,7 +2,6 @@
 import go/github:com.ifritJP.lnssqlite3.src.lns.sqlite3.base;
 
 pub fn __main( args:&List<str> ) : int {
-
    let! mut db = base.Open( "hoge.sqlite3", false, false ) {
       print( "open error" );
       return 1;

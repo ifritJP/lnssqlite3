@@ -1,0 +1,304 @@
+pub form errHandleForm( stmt:str, msg:str ) __trans;
+pub form queryForm( items: &List<&stem> ) __trans: bool;
+pub form queryMapForm( items: &Map<str,&stem> ) __trans: bool;
+
+fn log( level:int, ... ) {
+   // print( ... );
+}
+
+proto abstract class NativeDB;
+form NativeDBForm(db:&NativeDB, ... ) : ...;
+
+abstract class NativeDB {
+   pub abstract fn close() mut;
+   pub let nrows:NativeDBForm;
+   pub let rows:NativeDBForm;
+   pub let exec:NativeDBForm;
+   pub let errmsg:NativeDBForm;
+}
+
+module lsqlite3 require "lsqlite3" of "" {
+   pub static let OPEN_READONLY:int;
+   pub static let OPEN_READWRITE:int;
+   pub static let OPEN_CREATE:int;
+   pub static let OK:int;
+
+
+   pub static fn open_memory() : NativeDB!;
+   pub static fn open( path:str, flag:int ) : NativeDB!;
+   
+}
+
+pub class DBAccess {
+   let db:NativeDB;
+   let readonly:bool;
+   let mut beginFlag:bool;
+   local fn __init( db:NativeDB, readonly:bool ) {
+      self.db = db;
+      self.readonly = false;
+      self.beginFlag = false;
+   }
+   pub fn Close() mut;
+   pub fn Exec( stmt:str, errHandle: errHandleForm! ) mut;
+   pub fn Begin() mut;
+   pub fn Commit() mut;
+   pub fn MapQuery( query: str, callback: queryForm!, errHandle: errHandleForm! ) : bool;
+   pub fn MapQueryAsMap( query: str, callback: queryMapForm!, errHandle: errHandleForm! ) : bool;
+}
+
+fn DBAccess.errorExit( level:int, ... ) {
+   print( "Sqlite ERROR:", self.db.errmsg( self.db ## ), ... );
+   os.exit( 1 );
+}
+
+pub fn DBAccess.Close() mut {
+   self.db.close();
+}
+
+alge ActResult {
+   Ok( val:&List<&stem> ),
+   Ng( msg:str ),
+}
+
+form ActForm( db:&NativeDB, dbForm:NativeDBForm, ... ) : bool, stem;
+
+fn createActForm() : ActForm {
+   let loaded, message = _load( ```
+return function( db, form, ... )
+  local result
+  local success, message = pcall( function(...)
+    result = { form( db, ... ) }
+  end, ... )
+  if success then
+    return success, result
+  end
+  return success, message
+end
+```## );
+   when! loaded {
+      let funcObj = unwrap loaded(##);
+      return funcObj@@ActForm;
+   } else {
+      error( message or "load message" );
+   }
+}
+
+let actForm = createActForm();
+
+fn DBAccess.act( dbForm:NativeDBForm, ... ) : ActResult {
+   let success, result = actForm( self.db, dbForm, ... );
+   if success {
+      return .Ok( result@@List<stem> );
+   } else {
+      return .Ng( result@@str );
+   }
+}
+
+pub fn DBAccess.Exec( stmt:str, errHandle: errHandleForm! ) mut{
+   let errmsg:str!;
+   _match self.act( self.db.exec, stmt ) {
+      case .Ok( list ) {
+         if list[ 1 ] ~= lsqlite3.OK {
+            _match self.act( self.db.errmsg ## ) {
+               case .Ok( list2 ) {
+                  errmsg = list2[1]@@str;
+               }
+               case .Ng( msg2 ) {
+                  errmsg = msg2;
+               }
+            }
+         } else {
+            errmsg = nil;
+         }
+      }
+      case .Ng( msg ) {
+         errmsg = msg;
+      }
+   }
+   when! errmsg {
+      when! errHandle {
+         errHandle( stmt, errmsg );
+      } else {
+         self.errorExit( 3, stmt );
+      }
+   }
+}
+
+pub fn DBAccess.Begin() mut{
+   if self.readonly {
+      print( 1, "db mode is read only" );
+      os.exit( 1 );
+   }
+   self.Exec( "PRAGMA journal_mode = MEMORY"## );
+   self.Exec( "PRAGMA synchronous = OFF"## );
+   self.Exec( "BEGIN IMMEDIATE"## );
+
+   self.beginFlag = true;
+ }
+
+pub fn DBAccess.Commit() mut{
+   if self.readonly {
+      return;
+   }
+   if not self.beginFlag {
+      return;
+   }
+   self.beginFlag = false;
+
+   self.Exec(
+      "COMMIT",
+      fn ( stmt:str, msg:str ) {
+         if not msg.find( "no transaction is active"## ) {
+	    self.errorExit( 5, msg );
+         };
+      });
+}
+
+
+
+pub fn DBAccess.MapQuery(
+   query: str, callback: queryForm!, errHandle: errHandleForm! ) : bool
+{
+   let mut hit = false;
+
+   while true {
+      // 次の for 分を実行する。
+      // self:act で排他をかけるために、 for in の文法を分解してコールする
+      match self.act( self.db.rows, query ) {
+         case .Ng(msg) {
+	    if not msg.find( " is locked", 1, true ) {
+	       print( 1, msg );;
+	       break;
+            }
+            self.errorExit( 3, msg, query );
+         }
+         case .Ok( list ) {
+            let loopFunc, param, mut prev = list.unpack();
+            when! loopFunc, callback {
+	       while true {
+	          let! workItem = (loopFunc@@form)( param, prev ) {
+	             break;
+                  };
+                  prev = workItem;
+                  if not hit {
+                     hit = true;
+                  }
+                  let item:List<stem> = [];
+                  foreach val in workItem@@Map<stem,stem> {
+                     item.insert( val );
+                  }
+                  if not callback( item ) {
+	             break;
+                  }
+               }
+            }
+            break;
+         }
+      }
+   }
+   return hit;
+}
+
+pub fn DBAccess.MapQueryAsMap( query: str, callback: queryMapForm!, errHandle: errHandleForm! ) : bool{
+   let mut hit = false;
+
+   while true {
+      // 次の for 分を実行する。
+      // self:act で排他をかけるために、 for in の文法を分解してコールする
+      match self.act( self.db.nrows, query ) {
+         case .Ng(msg) {
+	    if not msg.find( " is locked", 1, true ) {
+	       print( 1, msg );;
+	       break;
+            }
+            self.errorExit( 3, msg, query );
+         }
+         case .Ok( list ) {
+            let loopFunc, param, mut prev = list.unpack();
+            when! loopFunc, callback {
+	       while true {
+	          let! item = (loopFunc@@form)( param, prev ) {
+	             break;
+                  };
+                  prev = item;
+                  if not hit {
+                     hit = true;
+                  }
+                  if not callback( item@@Map<str,stem> ) {
+	             break;
+                  }
+               }
+            }
+            break;
+         }
+      }
+   }
+   return hit;
+}
+
+
+   
+pub static fn Open( path: str, readonly: bool, onMemoryFlag: bool ) : DBAccess!, str
+{
+   let flag;
+   if readonly {
+      flag = lsqlite3.OPEN_READONLY;
+   } else {
+      flag = lsqlite3.OPEN_READWRITE + lsqlite3.OPEN_CREATE;
+   }
+   log(3, "DBAccess:open", flag );
+
+   let mut db;
+   {
+      let mut workDB;
+      if onMemoryFlag {
+         workDB = lsqlite3.open_memory();
+      } else {
+         workDB = lsqlite3.open( path, flag );
+      }
+      when! workDB {
+         db = workDB;
+      } else {
+         log( 1, "open error." );
+         return nil, "";
+      }
+   }
+   
+
+   // local sleepTime = math.random( 5, 40 )
+   // db:busy_handler(
+   //    function()
+   //       -- 更新アクセスと読み込みアクセスがバッティングすると busy になる。
+   //       -- 更新アクセス同士は、transLockObj で排他している。
+   //       -- 読み込みアクセスのみの場合、 busy にならないはず。
+   //       if obj.lockLogFlag then
+   //          obj.lockLogFlag = false
+   //          log( 2, "db is busy", obj.readonly and "r" or "w",
+   //      	 obj.writeAccessFlag and "write" or "read",
+   //      	 obj.beginFlag, obj.inLockFlag, obj.inActLockFlag, obj.actDepth )
+   //          Helper.msleep( sleepTime )
+   //       end
+   //       if not obj.inLockFlag then
+   //          -- 更新アクセスを優先し、読み込みアクセスは遅延させる。
+   //          -- 更新アクセスを止めると、更新処理が溜っていって並列性が下がるため。
+   //          Helper.msleep( sleepTime )
+   //          obj.lockCount = obj.lockCount + 1
+   //          -- obj:outputLog( "read busy " .. tostring( obj.transLockObj:isLocking() ) )
+   //          -- obj.transLockObj:begin()
+   //          -- obj:outputLog( "db is read busy" )
+   //          -- log( 2, "db is read busy",
+   //          -- 	 obj.readonly, obj.writeAccessFlag, obj.inActLockFlag, obj.actDepth )
+   //          -- obj.transLockObj:fin()
+   //       elseif not obj.beginFlag then
+   //          Helper.msleep( sleepTime )
+   //          obj.lockCount = obj.lockCount + 1
+   //       end
+   //       return true
+   //    end
+   // )
+
+   // log( 3, "open", obj.server )
+
+
+   return new DBAccess( db, readonly ), "";
+}

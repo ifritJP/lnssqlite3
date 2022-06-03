@@ -16,12 +16,12 @@ end
 
 local DB = {}
 _moduleObj.DB = DB
-function DB.setmeta( obj )
+function DB._setmeta( obj )
   setmetatable( obj, { __index = DB  } )
 end
-function DB.new(  )
+function DB._new(  )
    local obj = {}
-   DB.setmeta( obj )
+   DB._setmeta( obj )
    if obj.__init then
       obj:__init(  )
    end

@@ -126,12 +126,12 @@ end
 local NativeDB = {}
 
 
-function NativeDB.setmeta( obj )
+function NativeDB._setmeta( obj )
   setmetatable( obj, { __index = NativeDB  } )
 end
-function NativeDB.new( nrows, rows, exec, errmsg )
+function NativeDB._new( nrows, rows, exec, errmsg )
    local obj = {}
-   NativeDB.setmeta( obj )
+   NativeDB._setmeta( obj )
    if obj.__init then
       obj:__init( nrows, rows, exec, errmsg )
    end
@@ -150,9 +150,9 @@ local lsqlite3 = require( "lsqlite3" )
 
 local DBAccess = {}
 _moduleObj.DBAccess = DBAccess
-function DBAccess.new( db, readonly )
+function DBAccess._new( db, readonly )
    local obj = {}
-   DBAccess.setmeta( obj )
+   DBAccess._setmeta( obj )
    if obj.__init then obj:__init( db, readonly ); end
    return obj
 end
@@ -161,7 +161,7 @@ function DBAccess:__init(db, readonly)
    self.readonly = false
    self.beginFlag = false
 end
-function DBAccess.setmeta( obj )
+function DBAccess._setmeta( obj )
   setmetatable( obj, { __index = DBAccess  } )
 end
 
@@ -472,7 +472,7 @@ local function Open( path, readonly, onMemoryFlag )
    end
    
    
-   return DBAccess.new(db, readonly), ""
+   return DBAccess._new(db, readonly), ""
 end
 _moduleObj.Open = Open
 

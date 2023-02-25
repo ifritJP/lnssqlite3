@@ -1,8 +1,8 @@
 _lune_control default_async_all;
 
 pub form errHandleForm( stmt:str, msg:str ) __trans;
-pub form queryForm( items: &List<&stem> ) __trans: bool;
-pub form queryMapForm( items: &Map<str,&stem> ) __trans: bool;
+pub form queryForm( items: &_List<&stem> ) __trans: bool;
+pub form queryMapForm( items: &_Map<str,&stem> ) __trans: bool;
 
 pub interface DB {
    pub fn Close() mut;

@@ -1,5 +1,9 @@
 LNSC=lnsc
 
+ifneq "$(wildcard Makefile.local)" ""
+include Makefile.local
+endif
+
 help:
 	@echo make all
 

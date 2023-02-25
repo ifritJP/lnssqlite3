@@ -2,8 +2,8 @@
 local _moduleObj = {}
 local __mod__ = '@lns.@sqlite3.@access'
 local _lune = {}
-if _lune6 then
-   _lune = _lune6
+if _lune8 then
+   _lune = _lune8
 end
 function _lune.newAlge( kind, vals )
    local memInfoList = kind[ 2 ]
@@ -112,8 +112,8 @@ function _lune.__Cast( obj, kind, class )
    return nil
 end
 
-if not _lune6 then
-   _lune6 = _lune
+if not _lune8 then
+   _lune8 = _lune
 end
 
 

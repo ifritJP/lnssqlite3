@@ -1,6 +1,6 @@
 pub form errHandleForm( stmt:str, msg:str ) __trans;
-pub form queryForm( items: &List<&stem> ) __trans: bool;
-pub form queryMapForm( items: &Map<str,&stem> ) __trans: bool;
+pub form queryForm( items: &_List<&stem> ) __trans: bool;
+pub form queryMapForm( items: &_Map<str,&stem> ) __trans: bool;
 
 fn log( level:int, ... ) {
    // print( ... );
@@ -56,7 +56,7 @@ pub fn DBAccess.Close() mut {
 }
 
 alge ActResult {
-   Ok( val:&List<&stem> ),
+   Ok( val:&_List<&stem> ),
    Ng( msg:str ),
 }
 
@@ -88,7 +88,7 @@ let actForm = createActForm();
 fn DBAccess.act( dbForm:NativeDBForm, ... ) : ActResult {
    let success, result = actForm( self.db, dbForm, ... );
    if success {
-      return .Ok( result@@List<stem> );
+      return .Ok( result@@_List<stem> );
    } else {
       return .Ng( result@@str );
    }
@@ -183,8 +183,8 @@ pub fn DBAccess.MapQuery(
                   if not hit {
                      hit = true;
                   }
-                  let item:List<stem> = [];
-                  foreach val in workItem@@Map<stem,stem> {
+                  let item:_List<stem> = [];
+                  foreach val in workItem@@_Map<stem,stem> {
                      item.insert( val );
                   }
                   if not callback( item ) {
@@ -224,7 +224,7 @@ pub fn DBAccess.MapQueryAsMap( query: str, callback: queryMapForm!, errHandle: e
                   if not hit {
                      hit = true;
                   }
-                  if not callback( item@@Map<str,stem> ) {
+                  if not callback( item@@_Map<str,stem> ) {
 	             break;
                   }
                }

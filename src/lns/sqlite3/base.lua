@@ -2,11 +2,11 @@
 local _moduleObj = {}
 local __mod__ = '@lns.@sqlite3.@base'
 local _lune = {}
-if _lune6 then
-   _lune = _lune6
+if _lune8 then
+   _lune = _lune8
 end
-if not _lune6 then
-   _lune6 = _lune
+if not _lune8 then
+   _lune8 = _lune
 end
 
 
